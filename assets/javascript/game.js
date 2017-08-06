@@ -4,78 +4,121 @@
 
 // word bank containing the words available to guess
 var wordbank = [
-	'yellow', 
-	'green', 
-	'orange', 
-	'purple', 
-	'blue', 
-	'red', 
-	'pink'];
-
-// users start with a score of 0
-var score = 0;
-
-// current word being guessed
-var toGuess = wordbank[Math.floor(Math.random() * (wordbank.length))];
-	console.log(toGuess);
-	console.log(toGuess.length);
-
-// how many guesses the user has left
-var guessesRemaining = toGuess.length + 6;
-	console.log(guessesRemaining);
-
-// empty string for underscores
-var under = "";
-
-// an empty array to store the letters that have already been guessed
-var alreadyGuessed = [];
-
+	'yellow', 'green', 'orange', 'peach',
+	'purple', 'blue', 'red', 'pear',
+	'pink','magenta','cyan', 'coral',
+	'mauve','aquamarine', 'ivy', 'amber',
+	'taupe','maroon', 'gladiolus', 'olive',
+	'charcoal','sunflower', 'seagreen',
+	'ruby','diamond','emerald','daisy',
+	'hydrangea','poppy','dahlia', 'fuchia',
+	'rose','marigold','iris','carnation',
+	'daffodil','tulip','lilac', 'indigo',
+	'lily','peony','lavender', 'sage',
+	];
 		
 //FUNCTIONS
-	// place underscores with proper length
-	for (i = 0; i < toGuess.length; i++) {
-		under = under + "_ ";
+	var score = 0;
+	function setScore() {
+		document.getElementById("wins").innerHTML = "Current score: " + score;
+	}
+
+	function setWord() {
+		toGuess = '';
+		toGuess = wordbank[Math.floor(Math.random() * (wordbank.length))];
 	};
-	// console.log(under);
+
+	function setUnderscores() {
+		under = '';
+		for (i = 0; i < toGuess.length; i++) {
+			under = under + "_ ";
+		};
+		under = under.trim();
+		document.getElementById("word").innerHTML = under;
+	};
+
+	function setNumGuesses() {
+		guessesRemaining = 0;
+		guessesRemaining = toGuess.length + 5;
+		document.getElementById("remaining").innerHTML = "You have " + guessesRemaining + " guesses remaining.";
+		console.log(guessesRemaining);
+	};
+
+	function clearGuessArray() {
+		alreadyGuessed = [];
+	}
 
 	// check if letter already guessed, if not add to array
+	function replaceWithLetter(press){
+		// get all the indexes of the letter within the word
+		for(var i = 0; i < toGuess.length; i++){
+			if(toGuess[i] === press) {
+				// create array out of current string
+				var newUnder = under.split(" ");
+				// add letter to proper location within underscore array
+				newUnder.splice(i, 1, press);
+				// turn array back into string and display on screen
+				under = newUnder.join(' ');
+				document.getElementById("word").innerHTML = under;
+			};
+		};
+		if(under === toGuess.split('').join(' ')) {
+			winner();
+		};
+	};
+
 	function addToGuessed(x){
-
 		var notInside = alreadyGuessed.indexOf(x);
-
-		if(notInside === -1) {
-			// do push
+		if(notInside === -1) { 
 			alreadyGuessed.push(x);
-		}; // if inside, don't push
+			guessesRemaining = guessesRemaining - 1;
+			document.getElementById("remaining").innerHTML = "You have " + guessesRemaining + " guesses remaining.";
+		};
+		if(guessesRemaining === 0) {
+			loser();
+		};
 	};
 
-	// how to make first letter press not appear in display on page???
-	// this is just a copy of an empty array... next if statement will never run
-	var copy = alreadyGuessed.slice();
-	
-	// i want this to take the first element off the array just once. 
-	if(alreadyGuessed.length > 1) {
-		copy.splice(0,1);
+	function loser() {
+		alert("You lost! The word was " + toGuess + ".");
+		restart();
 	};
-		console.log(copy); // this just prints an empty array. 
 
-	// i want to decrease the number of remaining guesses for each incorrect letter
-	// that is, if the letter is not in the word, and if the letter is not
-	// already in the array
+	function winner() {
+		score = score + 1;
+		alert("Nice, you got it!");
+		restart();
+	}
+
+	function restart() {
+		setWord();
+		setUnderscores();
+		setNumGuesses();
+		setScore();
+		clearGuessArray();
+	};
+
+	document.onkeyup = function(event) {
+
+		var userInput = String.fromCharCode(event.keyCode).toLowerCase();
+			// display already guessed letters on page
+			addToGuessed(" " + userInput);
+			document.getElementById("already").innerHTML = alreadyGuessed;
+			replaceWithLetter(userInput);
+	};
+
+	window.onload = function gameStart() {
+		setWord();
+		setUnderscores();
+		setNumGuesses();
+		setScore();
+		clearGuessArray();
+	};
 
 
-// PROCESS
-document.onkeyup = function(event) {
 
-	var input = String.fromCharCode(event.keyCode).toLowerCase();
 
-		// display underscores on page
-		document.querySelector("#word").innerHTML = under;
 
-		// display already guessed letters on page
-		addToGuessed(" " + input)
-		document.querySelector("#already").innerHTML = alreadyGuessed;
-}
 
 
 
